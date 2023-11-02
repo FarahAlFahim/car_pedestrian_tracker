@@ -4,11 +4,14 @@ import cv2
 image_file = 'car_image.jpg'
 video = cv2.VideoCapture('cars_and_pedestrian_video.mp4')
 
-# pre-trained car classifier
-car_classifier = 'car_detector.xml'
+# pre-trained car and predestrian classifiers
+car_classifier_file = 'car_detector.xml'
+pedestrian_classifier_file = 'pedestrian_detector.xml'
 
-# car classifier
-car_tracker = cv2.CascadeClassifier(car_classifier)
+
+# car and pedestrian classifiers
+car_tracker = cv2.CascadeClassifier(car_classifier_file)
+pedestrian_tracker = cv2.CascadeClassifier(pedestrian_classifier_file)
 
 
 # loop through the whole video
@@ -25,51 +28,36 @@ while True:
 
     # detect cars
     cars = car_tracker.detectMultiScale(grayscaled_frame)
+    pedestrians = pedestrian_tracker.detectMultiScale(grayscaled_frame)
 
     # drawing rectangles around cars
     for (x, y, w, h) in cars:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+    # drawing rectangles around pedestrians
+    for (x, y, w, h) in pedestrians:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
 
 
 
 
 
 
-    # display image
+
+    # displaying the video with cars and pedestrians spotted
     cv2.imshow('Car and Pedestrian Detector', frame)
 
 
     # no autoclosing (waiting for a key press)
     cv2.waitKey(1)
 
-'''
-# opencv image
-img = cv2.imread(image_file)
+    # stop if Q is pressed
+    if cv2.waitKey(1) == ord('Q') or cv2.waitKey(1) == ord('q'):
+        break
 
-# convert to grayscale (required for haar cascade)
-black_and_white = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-
-# car classifier
-car_tracker = cv2.CascadeClassifier(car_classifier)
-
-# detect cars
-cars = car_tracker.detectMultiScale(black_and_white)
-
-# drawing rectangles around cars
-for (x, y, w, h) in cars:
-    cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+# releasing the VideoCapture object
+video.release()
 
 
-
-
-# display image
-cv2.imshow('Car and Pedestrian Detector', video)
-
-
-# no autoclosing (waiting for a key press)
-cv2.waitKey()
-'''
 
 print('Have a Safe Ride!')
